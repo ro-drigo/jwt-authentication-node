@@ -7,9 +7,18 @@ const router = express.Router()
 
 //rota para cadastro de usuário
 router.post('/register', async (req, res) => {
+    const { email } = req.body
+
     try{
+        //validando para caso já exista esse usuário
+        if(await User.findOne({ email }))
+            return res.status(400).send({ error: 'User already exists'  })
 
         const user = await User.create(req.body)
+
+        //não retornar senha
+        user.password = undefined;
+
         return res.send({ user })
 
     }catch (err){

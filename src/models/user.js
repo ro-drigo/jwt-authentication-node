@@ -1,4 +1,6 @@
 const mongoose = require('../database')
+const bcrypt = require('bcryptjs')
+
 
 //criando a tabela do usuário
 const UserSchema = new mongoose.Schema({
@@ -21,6 +23,14 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+})
+
+//encriptando a senha
+UserSchema.pre('save', async function(next){
+    const hash = await bcrypt.hash(this.password, 10)
+    this.password = hash
+
+    next()
 })
 
 //definindo a criação do model
