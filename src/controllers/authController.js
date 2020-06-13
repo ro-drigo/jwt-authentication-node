@@ -2,6 +2,10 @@ const express = require('express')
 //buscando nossa tabela usuário
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+//importar o hash (secret)
+const authConfig = require('../config/auth.json')
 
 //Router para definir rotas só para usuários
 const router = express.Router()
@@ -43,9 +47,16 @@ router.post('/authenticate', async (req, res) => {
     if(!await bcrypt.compare(password, user.password))
         return res.status(400).send({ error: 'Invalid password' })
 
+    //esconder a password
     user.password = undefined
+
+    //gerar o token
+    const token = jwt.sign({ id: user.id }, authConfig.secret, {
+        //token vai expirar em 1 dia
+        expiresIn: 86400
+    })
     
-    res.send({ user })
+    res.send({ user, token })
 })
 
 //o /auth estará prefixada antes das outras rotas feitas no controller
