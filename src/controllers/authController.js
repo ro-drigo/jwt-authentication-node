@@ -10,6 +10,14 @@ const authConfig = require('../config/auth.json')
 //Router para definir rotas só para usuários
 const router = express.Router()
 
+//gerar token
+function generateToken(params = {}){
+    return jwt.sign(params, authConfig.secret, {
+        //token vai expirar em 1 dia
+        expiresIn: 86400
+    })
+}
+
 //rota para cadastro de usuário
 router.post('/register', async (req, res) => {
     const { email } = req.body
@@ -22,9 +30,13 @@ router.post('/register', async (req, res) => {
         const user = await User.create(req.body)
 
         //não retornar senha
-        user.password = undefined;
+        user.password = undefined
 
-        return res.send({ user })
+        //retornando, além do usuário, o token para acesso
+        return res.send({ 
+            user,
+            token: generateToken({ id: user.id })
+        })
 
     }catch (err){
 
@@ -49,14 +61,11 @@ router.post('/authenticate', async (req, res) => {
 
     //esconder a password
     user.password = undefined
-
-    //gerar o token
-    const token = jwt.sign({ id: user.id }, authConfig.secret, {
-        //token vai expirar em 1 dia
-        expiresIn: 86400
-    })
     
-    res.send({ user, token })
+    res.send({ 
+        user, 
+        token: generateToken({ id: user.id }) 
+    })
 })
 
 //o /auth estará prefixada antes das outras rotas feitas no controller
