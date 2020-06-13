@@ -8,7 +8,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 //Passando o app no fim para que o authcontroller tambem tenha o app
-require('./controllers/authController')(app)
-require('./controllers/projectController')(app)
+require('./app/controllers/index')(app)
 
 app.listen(3000)

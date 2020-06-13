@@ -6,7 +6,8 @@ mongoose.Promise = global.Promise
 mongoose.connect('mongodb://localhost/auth', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
 })
 
 module.exports = mongoose
