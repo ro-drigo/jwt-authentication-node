@@ -17,13 +17,21 @@ router.get('/', async (req, res) => {
         return res.send({ projects })
 
     } catch (err) {
-        return res.status(400).send({ error: 'Error loading project' })
+        return res.status(400).send({ error: 'Error loading projects' })
     }
 })
 
 //listar um só
 router.get('/:projectId', async (req, res) => {
-    res.send({ user: req.userId })
+    try {
+        //com o populate podemos usar o iggerloading
+        const project = await Project.findById(req.params.projectId).populate('user')
+
+        return res.send({ project })
+
+    } catch (err) {
+        return res.status(400).send({ error: 'Error loading project' })
+    }
 })
 
 //rota para criar
