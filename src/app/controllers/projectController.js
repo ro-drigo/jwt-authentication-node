@@ -53,7 +53,15 @@ router.put('/:projectId', async (req, res) => {
 
 //rota para deletar
 router.delete('/:projectId', async (req, res) => {
-    res.send({ user: req.userId })
+    try {
+        //com o populate podemos usar o iggerloading
+        await Project.findByIdAndRemove(req.params.projectId).populate('user')
+
+        return res.send()
+
+    } catch (err) {
+        return res.status(400).send({ error: 'Error deleting project' })
+    }
 })
 
 module.exports = app => app.use('/projects', router)
