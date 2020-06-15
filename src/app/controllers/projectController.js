@@ -3,6 +3,7 @@ const authMiddleware = require('../middlewares/auth')
 
 const router = express.Router()
 
+//ver se o token está válido
 router.use(authMiddleware)
 
 router.get('/', (req, res) => {
