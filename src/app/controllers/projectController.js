@@ -61,7 +61,34 @@ router.post('/', async (req, res) => {
 
 //rota para editar
 router.put('/:projectId', async (req, res) => {
-    res.send({ user: req.userId })
+    try {
+        const { title, description, tasks } = req.body
+
+        const project = await Project.findByIdAndUpdate(req.params.projectId, { 
+            title, 
+            description 
+            //com o new true, o mongo mostra o atualizado
+            }, { new: true })
+        
+        project.tasks = []
+        await Task.remove({ project: project._id })
+
+        //percorrer as tasks
+        await Promise.all(tasks.map(async task => {
+            const projectTask = new Task({ ...task, project: project._id })
+
+            await projectTask.save()
+
+            project.tasks.push(projectTask)
+        }))
+
+        await project.save()
+
+        return res.send({ project })
+
+    } catch (err) {
+        return res.status(400).send({ error: 'Error on updating project' })
+    }
 })
 
 //rota para deletar
