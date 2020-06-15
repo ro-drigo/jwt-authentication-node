@@ -10,7 +10,15 @@ const router = express.Router()
 router.use(authMiddleware)
 
 router.get('/', async (req, res) => {
-    res.send({ user: req.userId })
+    try {
+        //com o populate podemos usar o iggerloading
+        const projects = await Project.find().populate('user')
+
+        return res.send({ projects })
+
+    } catch (err) {
+        return res.status(400).send({ error: 'Error loading project' })
+    }
 })
 
 //listar um só
@@ -21,7 +29,7 @@ router.get('/:projectId', async (req, res) => {
 //rota para criar
 router.post('/', async (req, res) => {
     try {
-        const project = await Project.create(req.body)
+        const project = await Project.create({ ...req.body, user: req.userId })
 
         return res.send({ project })
 
